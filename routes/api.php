@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\AlumnoAPI;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,3 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::post("guardar", [AlumnoAPI::class, 'guardar']);
+Route::get("alumnos/{id?}", [AlumnoAPI::class, 'alumnos']);
+Route::put("actualizar", [AlumnoAPI::class, 'actualizar']);
