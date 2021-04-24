@@ -131,6 +131,22 @@
        usuario.value = data.usuario
        $("#modal").modal('show');
    }
+
+   async function eliminar(id) {
+    const res = await fetch('http://127.0.0.1:8000/api/eliminar/'+id, {
+           method:'DELETE',
+           mode: 'cors',
+           headers:{
+               'X-CSRF-TOKEN': _token.value,
+               'Content-Type': 'application/json'
+           },   
+       });
+       const data = await res.json()
+       console.log(data)
+       lista()
+   }
+
+
     
    async function guardarAlumno(){   
        let obj = { id_alumno:id_alumno.value, nombre:nombre.value, correo:correo.value, apellido:apellido.value, usuario:usuario.value, password:password.value };

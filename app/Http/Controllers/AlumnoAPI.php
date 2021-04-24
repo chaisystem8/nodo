@@ -40,4 +40,17 @@ class AlumnoAPI extends Controller
         return $id?Alumno::where('id_alumno', $id)->first():Alumno::all();
         
     }
+
+    function eliminar($id){
+        
+        $alumno = Alumno::find($id);
+        $result = $alumno->delete();
+
+        if($result){
+            return ["Result" => "Alumno Borrado"];
+        }else{
+            return ["Result" => "Error al borrar"];
+        }
+        
+    }
 }

@@ -23,3 +23,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post("guardar", [AlumnoAPI::class, 'guardar']);
 Route::get("alumnos/{id?}", [AlumnoAPI::class, 'alumnos']);
 Route::put("actualizar", [AlumnoAPI::class, 'actualizar']);
+Route::delete("eliminar/{id?}", [AlumnoAPI::class, 'eliminar']);
