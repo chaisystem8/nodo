@@ -53,4 +53,15 @@ class AlumnoAPI extends Controller
         }
         
     }
+
+    function buscar($cadena){
+        if($cadena === ''){
+            return Alumno::all();
+        }else{
+            return Alumno::where("nombre","like", "%".$cadena."%")
+                        ->orwhere("correo","like", "%".$cadena."%")
+                        ->get();
+        }
+        
+    }
 }

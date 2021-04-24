@@ -8,9 +8,20 @@
       <!-- Fonts -->
       <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
    </head>
-   <body class="antialiased">
-      <div class="container">
-         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal" onclick="clearInput()">Nuevo Usuario</button>
+   <body>
+       <div class="container">
+
+       <h1>Chaisystem</h1>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">       
+            <div class="container-fluid">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal" onclick="clearInput()">Nuevo Usuario</button>         
+                <form id="forms"class="d-flex" onsubmit="return search()">
+                <input id="buscar" class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
+                <button class="btn btn-outline-success" type="button" onclick="search()" >Buscar</button>
+                </form>          
+            </div>
+        </nav>
+
          <!-- Modal -->
          <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -75,13 +86,16 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
+
    let id_alumno =  document.getElementById('id_alumno'); 
    let nombre =  document.getElementById('nombre');    
    let correo =  document.getElementById('correo');
    let apellido =  document.getElementById('apellido');
    let usuario =  document.getElementById('usuario');
    let password =  document.getElementById('password');
-   let _token =  document.getElementById('token');
+   let _token =  document.getElementById('token');   
+
+
    
    $(function() {
        lista()    
@@ -164,9 +178,7 @@
         $("#modal").modal('hide')
     }      
    ////////////////////CRUD FETCH FIN ///////////////////////
-   function clearInput(){              
-       id_alumno.value = nombre.value = correo.value = apellido.value = usuario.value = password.value = ""
-   }
+
 
     /////// SORT BOOTSTRAP TABLE //////////
         function sortTable(table, col, reverse) {
@@ -202,5 +214,53 @@
 
         window.onload = function () {makeAllSortable();};
     /////// SORT BOOTSTRAP TABLE FIN//////////
+
+
+    function clearInput(){              
+       id_alumno.value = nombre.value = correo.value = apellido.value = usuario.value = password.value = ""
+    }
+   
+    $("#forms").on("keypress", function (event) {
+        var keyPressed = event.keyCode || event.which;
+        if (keyPressed === 13) {
+            search()
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    async function search(){       
+        var cadena = $("#buscar").val();
+        if(cadena == ''){
+            lista();
+            return 0
+        }
+        
+        const res = await fetch('http://127.0.0.1:8000/api/buscar/'+cadena, {
+            method:'GET',
+            mode: 'cors',
+            headers:{
+                'X-CSRF-TOKEN': _token.value,
+                'Content-Type': 'application/json'
+            },   
+        });
+         const data = await res.json()                       
+        $("#tbody").empty()
+        let tr = '';
+        data.forEach(data2 => {
+            console.log(data2.nombre)
+            tr += `<tr>
+                <td>`+data2.id_alumno+`</td>
+                <td>`+data2.nombre+` `+data2.apellido+`</td>
+                <td>`+data2.usuario+`</td>
+                <td>`+data2.correo+`</td>
+                <td><button type="button" class="btn btn-info" onclick="detalle(`+data2.id_alumno+`)">Detalle</button>
+                    <button type="button" class="btn btn-primary" onclick="editar(`+data2.id_alumno+`)">Editar</button>         
+                    <button type="button" class="btn btn-danger" onclick="eliminar(`+data2.id_alumno+`)">Eliminar</button></td>
+                </tr>`
+        });
+        $("#tbody").append(tr); 
+
+    }
    
 </script>
