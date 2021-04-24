@@ -1,0 +1,48 @@
+SCRIPT AUXILIARES SQL
+
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `nodo`.`detalle_alumno_periodo` AS
+    SELECT 
+        `a`.`id_alumno` AS `id_alumno`,
+        `p`.`id_periodo` AS `id_periodo`,
+        CONCAT(`a`.`nombre`, ' ', `a`.`apellido`) AS `nombre`,
+        `a`.`usuario` AS `usuario`,
+        `a`.`correo` AS `correo`,
+        `p`.`periodo` AS `periodo`,
+        `g`.`grado` AS `grado`,
+        `gu`.`grupo` AS `grupo`,
+        GROUP_CONCAT(`m`.`materia`
+            SEPARATOR ',') AS `materias`
+    FROM
+        ((((`nodo`.`periodos` `p`
+        LEFT JOIN `nodo`.`alumnos` `a` ON ((`a`.`id_alumno` = `p`.`id_alumno`)))
+        LEFT JOIN `nodo`.`grados` `g` ON ((`g`.`id_grado` = `p`.`id_grado`)))
+        LEFT JOIN `nodo`.`grupos` `gu` ON ((`gu`.`id_grupo` = `p`.`id_grupo`)))
+        LEFT JOIN `nodo`.`materias` `m` ON ((`m`.`id_grado` = `p`.`id_grado`)))
+    GROUP BY `p`.`id_periodo`
+
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_alumno_periodo`(IN IDA INT)
+BEGIN
+select concat(a.nombre, " ", a.apellido) nombre, a.usuario, a.correo, 
+	p.periodo, g.grado, gu.grupo,
+	group_concat(m.materia) materias 
+	from periodos p
+	left join alumnos a on a.id_alumno  = p.id_alumno
+	left join grados g on g.id_grado  = p.id_grado 
+	left join grupos gu on gu.id_grupo  = p.id_grupo 
+	left join materias m on m.id_grado = p.id_grado 
+	where p.id_alumno = IDA
+	group by p.id_periodo; 
+END
+
+CREATE DEFINER=`root`@`localhost` 
+TRIGGER `insertautoperiodo` 
+AFTER INSERT ON `alumnos` 
+FOR EACH ROW 
+INSERT INTO periodos(id_alumno,id_grado,id_grupo,periodo) 
+VALUES (NEW.id_alumno, (SELECT ROUND((RAND() * (6-1))+1)), 1, 'Junio 2021 - Diciembre 2021')
