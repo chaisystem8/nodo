@@ -26,4 +26,4 @@ Route::put("actualizar", [AlumnoAPI::class, 'actualizar']);
 Route::delete("eliminar/{id?}", [AlumnoAPI::class, 'eliminar']);
 Route::get("buscar/{cadena?}", [AlumnoAPI::class, 'buscar']);
 
-Route::get("detalle/{id?}", [AlumnoAPI::class, 'detalle']);
+Route::get("detalle/{id?},{sp?}", [AlumnoAPI::class, 'detalle']);
