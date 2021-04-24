@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumno;
+use App\Models\Periodo;
 use Illuminate\Http\Request;
 
 class AlumnoAPI extends Controller
@@ -63,5 +64,29 @@ class AlumnoAPI extends Controller
                         ->get();
         }
         
+    }
+
+    function detalle($id){
+
+        $periodo = Periodo::where('id_alumno', $id)->first();
+       
+        if(is_null($periodo))
+        {
+            return Alumno::where('id_alumno', $id)->first();
+        }else{
+                                            
+            $periodo = Periodo::select('alumnos.usuario','alumnos.correo', 'periodos.periodo', 'grado', 'grupo')
+                            ->selectRaw('CONCAT(alumnos.nombre, " " ,alumnos.apellido) as nombre')        
+                            ->selectRaw('GROUP_CONCAT(materias.materia) as materias')
+                            ->leftJoin("alumnos","alumnos.id_alumno","=","periodos.id_alumno")
+                            ->leftJoin("grados","grados.id_grado","=","periodos.id_grado")
+                            ->leftJoin("grupos","grupos.id_grupo","=","periodos.id_grupo")
+                            ->leftJoin("materias","materias.id_grado","=","periodos.id_grado")
+                            ->where('periodos.id_alumno','=',$id)
+                            ->groupBy('periodos.id_alumno')
+                            ->get();
+            return $periodo[0];
+        }
+
     }
 }

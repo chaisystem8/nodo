@@ -14,7 +14,7 @@
        <h1>Chaisystem</h1>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">       
             <div class="container-fluid">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal" onclick="clearInput()">Nuevo Usuario</button>         
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal" onclick="nuevoAlumno()">Nuevo Usuario</button>         
                 <form id="forms"class="d-flex" onsubmit="return search()">
                 <input id="buscar" class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
                 <button class="btn btn-outline-success" type="button" onclick="search()" >Buscar</button>
@@ -32,27 +32,44 @@
                   </div>
                   <div class="modal-body">
                      <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                            <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}"/>
                            <input type="hidden" name="id" id="id_alumno" value=""/>
                            <label for="nombre">Nombre</label>
                            <input type="text" class="form-control" id="nombre" placeholder="Nombre">
                         </div>
-                        <div class="form-group col-md-6">
+                        <div id="divapellido" class="form-group col-md-12">
                            <label for="apellido">Apellido</label>
                            <input type="text" class="form-control" id="apellido" placeholder="Apellido">
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                            <label for="usuario">Usuario</label>
                            <input type="text" class="form-control" id="usuario" placeholder="Usuario">
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                            <label for="email">Correo</label>
                            <input type="email" class="form-control" id="correo" placeholder="Correo">
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12" id="divpass">
                            <label for="password">Password</label>
                            <input type="password" class="form-control" id="password" placeholder="Password">
+                        </div>
+                        <div id="divdetalle">
+                            <div class="form-group col-md-12">
+                                <label>Grado y grupo</label>
+                                <div class="input-group">                                    
+                                    <input type="text" id="grado"  class="form-control">
+                                    <input type="text" id="grupo" class="form-control">
+                                  </div>                            
+                             </div>
+                             <div class="form-group col-md-12">
+                                <label>Periodo</label>
+                                <input type="text" class="form-control" id="periodo">
+                             </div>
+                             <div class="form-group col-md-12">
+                                <label>Materias</label>
+                                <input type="text" class="form-control" id="materias">
+                             </div>
                         </div>
                      </div>
                   </div>
@@ -63,6 +80,7 @@
                </div>
             </div>
          </div>
+
          <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
             <div class="grid">
                <table class="table">
@@ -93,7 +111,12 @@
    let apellido =  document.getElementById('apellido');
    let usuario =  document.getElementById('usuario');
    let password =  document.getElementById('password');
-   let _token =  document.getElementById('token');   
+   let _token =  document.getElementById('token');  
+
+   let grado =  document.getElementById('grado');  
+   let grupo =  document.getElementById('grupo');  
+   let periodo =  document.getElementById('periodo');  
+   let materias =  document.getElementById('materias');   
 
 
    
@@ -137,12 +160,15 @@
                 'Content-Type': 'application/json'
             },   
         });
-        const data = await res.json()            
+        const data = await res.json()
+        $("#divpass, #divapellido, #btnguardar").show();
+        $("#divdetalle").hide();            
         id_alumno.value = data.id_alumno
         nombre.value = data.nombre
         correo.value = data.correo 
         apellido.value = data.apellido
         usuario.value = data.usuario
+        password.value = ''
         $("#modal").modal('show');
     }
     async function eliminar(id) {
@@ -219,6 +245,11 @@
     function clearInput(){              
        id_alumno.value = nombre.value = correo.value = apellido.value = usuario.value = password.value = ""
     }
+    function nuevoAlumno(){
+        clearInput()
+        $("#divpass").show()
+        $("#divdetalle").hide();
+    }
    
     $("#forms").on("keypress", function (event) {
         var keyPressed = event.keyCode || event.which;
@@ -260,6 +291,36 @@
                 </tr>`
         });
         $("#tbody").append(tr); 
+
+    }
+    async function detalle(id) {
+        const res = await fetch('http://127.0.0.1:8000/api/detalle/'+id, {
+            method:'GET',
+            mode: 'cors',
+            headers:{
+                'X-CSRF-TOKEN': _token.value,
+                'Content-Type': 'application/json'
+            },   
+        });
+        clearInput()
+        const data = await res.json()  
+        console.log(data)              
+        id_alumno.value = data.id_alumno
+        nombre.value = data.nombre
+        correo.value = data.correo         
+        usuario.value = data.usuario
+
+        grado.value = data.grado = (data.grado === undefined) ? 'Sin grado' : data.grado
+        grupo.value = data.grupo = (data.grupo === undefined) ? 'Sin grupo' : data.grupo
+        periodo.value = data.periodo = (data.periodo === undefined) ? 'Sin periodo' : data.periodo
+        materias.value = data.materias = (data.materias === undefined) ? 'Sin materias' : data.materias
+
+    
+
+        
+        $("#divpass, #divapellido, #btnguardar").hide();
+        $("#divdetalle").show();
+        $("#modal").modal('show');
 
     }
    
